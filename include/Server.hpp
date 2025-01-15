@@ -1,6 +1,7 @@
 #pragma once
 
-#include <iostream>
+#include "Utils.hpp"
+#include <cstddef>
 #include <random>
 
 class Server {
@@ -10,19 +11,24 @@ public:
         DEPARTURE
     };
 
+    struct SimResult {
+        std::size_t totalServedQueries;
+        std::size_t totalDroppedQueries;
+        double lastQueryServeTime;
+        double averageWaitTime;
+        double averageServeTime;
+    };
+
     struct Event {
         double time;
         EventType eventType;
     };
 
-    Server(double arrivalRate, double serviceRate, std::size_t msgNum);
-    void simulate(std::size_t msgNum, double simTime);
+    Server(double arrivalRate, double serviceRate, std::size_t maxQueueSize);
+    SimResult simulate(double simTime);
 
 private:
-    std::default_random_engine generator;
-    std::exponential_distribution<double> arrivalDist;
-    std::poisson_distribution<int> poissonDist;
     double m_arrivalRate;
     double m_serviceRate;
-    std::size_t m_msgNum;
+    std::size_t m_maxQueueSize;
 };

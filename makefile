@@ -3,7 +3,7 @@ CFLAGS= -g -std=c++23
 INCLUDE_DIR=./include
 SRC_DIR = ./src
 BUILD_DIR = ./build
-TARGET= prog
+TARGET= simulator
 
 CPP_SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 SOURCES = $(CPP_SOURCES)
@@ -22,6 +22,6 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CFLAGS) $(LINK) -c $< -o $@ 
 
 clean:
-	rm -f $(BUILD_DIR)/*.o $(BUILD_DIR)/$(TARGET)
+	rm -f $(BUILD_DIR)/*.o ./$(TARGET)
 
 

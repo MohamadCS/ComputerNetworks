@@ -48,7 +48,7 @@ Server::SimResult Server::simulate(double simTime) const {
     double currentTime = 0;
 
     // Stores all events that arrived, with currentTime > arrivingTime.
-    std::queue<double> waitQueue{};
+    std::queue<double> arrivalTimeQueue{};
 
     // Stores all events that are going to happen (packets arriving, or packets finishing).
     std::priority_queue<Server::Event, std::vector<Server::Event>, EventGreater> eventHeap{};
@@ -58,11 +58,9 @@ Server::SimResult Server::simulate(double simTime) const {
 
     bool isServerBusy = false;
     std::size_t totalDroppedPackets = 0, totalServedNum = 0;
-    double totalWaitTime = 0, totalServeTime = 0, lastQueryServerTime = 0;
+    double totalWaitTime = 0;
 
     SimResult simResult;
-
-    LOG("Started Server Sim");
 
     while (currentTime < simTime) {
 
@@ -76,51 +74,45 @@ Server::SimResult Server::simulate(double simTime) const {
             // If the server is not busy, sample a serving time and put it to headp
             if (!isServerBusy) {
                 isServerBusy = true;
-                double serveTime = getExpNumber(m_serviceRate);
-                double schedTime = currentTime + serveTime;
-                eventHeap.push({schedTime, Server::EventType::DEPARTURE});
-                totalServeTime += serveTime;
-                LOG(std::format("Departure sched to {}", schedTime));
+                double serveTime = currentTime + getExpNumber(m_serviceRate);
+                eventHeap.push({serveTime, Server::EventType::DEPARTURE});
 
             } else {
                 // If there server is busy, put the packet in the waiting queue, as long
                 // as there is space, otherwise, drop the packet
-                if (waitQueue.size() < m_maxQueueSize) {
-                    waitQueue.push(eventTime);
+                if (arrivalTimeQueue.size() < m_maxQueueSize) {
+                    arrivalTimeQueue.push(eventTime);
                 } else {
                     totalDroppedPackets++;
                 }
             }
 
             // Prepare the next arrival
-            double arriveTime = getExpNumber(m_arrivalRate);
-            double schedTime = arriveTime + currentTime;
-            eventHeap.push({schedTime, Server::EventType::ARRIVAL});
-            LOG(std::format("Arrive sched to {}", schedTime));
+            double nextArrival = currentTime + getExpNumber(m_arrivalRate);
+            eventHeap.push({nextArrival, Server::EventType::ARRIVAL});
         }
 
         // If the server finished serving the packet:
         if (eventType == Server::EventType::DEPARTURE) {
             totalServedNum++;
-            lastQueryServerTime = currentTime;
             // If there are packets waiting get one and generate a serving time for it
-            if (!waitQueue.empty()) {
-                double arrivalTime = waitQueue.front();
-                waitQueue.pop();
+            if (!arrivalTimeQueue.empty()) {
+                double arrivalTime = arrivalTimeQueue.front();
+                arrivalTimeQueue.pop();
                 double waitTime = currentTime - arrivalTime;
                 totalWaitTime += waitTime;
 
                 // Serve the oldest query waiting in the queue
-                double serveTime = getExpNumber(m_serviceRate);
-                double schedTime = currentTime + serveTime;
-                eventHeap.push({schedTime, Server::EventType::DEPARTURE});
-                LOG(std::format("Departure sched to {}", schedTime));
-                totalServeTime += serveTime;
+                double serveTime = currentTime + getExpNumber(m_serviceRate);
+                eventHeap.push({serveTime, Server::EventType::DEPARTURE});
             } else {
                 isServerBusy = false;
             }
         }
     }
+
+    simResult.totalServedQueries = totalServedNum;
+    simResult.totalDroppedQueries = totalDroppedPackets;
 
     return simResult;
 }
@@ -223,6 +215,7 @@ Server::SimResult Server::simulate(double simTime) const {
             // Serve the oldest query waiting in the queue
             double serveTime = getExpNumber(m_serviceRate);
             double schedTime = currentTime + serveTime;
+            eventHeap.push({currentTime + serveTime, Server::EventType::DEPARTURE});
             eventHeap.push({schedTime, Server::EventType::DEPARTURE});
             LOG(std::format("Departure sched to {}", schedTime));
             totalServeTime += serveTime;
@@ -231,9 +224,7 @@ Server::SimResult Server::simulate(double simTime) const {
         // Last if
         while (!eventHeap.empty()) {
             auto [eventTime, _] = eventHeap.top();
-            eventHeap.pop();
             currentTime = eventTime;
-            LOG(std::format("Current Time is {}", currentTime));
             lastQueryServerTime = currentTime;
             totalServedNum++;
             if (!waitQueue.empty()) {
@@ -244,9 +235,7 @@ Server::SimResult Server::simulate(double simTime) const {
 
                 // Serve the oldest query waiting in the queue
                 double serveTime = getExpNumber(m_serviceRate);
-                double schedTime = currentTime + serveTime;
-                eventHeap.push({schedTime, Server::EventType::DEPARTURE});
-                LOG(std::format("Departure sched to {}", schedTime));
+                eventHeap.push({currentTime + serveTime, Server::EventType::DEPARTURE});
                 totalServeTime += serveTime;
             }
         }

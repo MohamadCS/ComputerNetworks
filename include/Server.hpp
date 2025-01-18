@@ -25,7 +25,7 @@ public:
     };
 
     Server(double arrivalRate, double serviceRate, std::size_t maxQueueSize);
-    SimResult simulate(double simTime);
+    SimResult simulate(double simTime) const;
 
 private:
     double m_arrivalRate;

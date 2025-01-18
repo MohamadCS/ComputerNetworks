@@ -6,6 +6,7 @@ BUILD_DIR = ./build
 TARGET= simulator
 
 CPP_SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
+DEBUG_FLAG = -D ENABLE_DEBUG=1
 SOURCES = $(CPP_SOURCES)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CPP_SOURCES))
 LINK = -I$(INCLUDE_DIR)

@@ -9,7 +9,7 @@ public:
     LoadBalancer(double internetSendingRate, const std::vector<double>& probVec,
                  const std::vector<std::size_t>& maxQueueVec, const std::vector<double>& servingRateVec);
 
-    void simulate() const;
+    void simulate(double simTime) const;
 
 private:
     double m_internetSendingRate;

@@ -48,7 +48,7 @@ std::pair<LoadBalancer,double> parseArguments(int argc, char* argv[]) {
     maxQueueSizesVec.reserve(serversNum);
 
     for (int i = currIdx; i < currIdx + serversNum; ++i) {
-        maxQueueSizesVec.push_back(std::stod(argv[i]));
+        maxQueueSizesVec.push_back(std::stoi(argv[i]));
     }
 
     LOG("Queue Sizes Vec");

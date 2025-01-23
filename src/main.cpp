@@ -1,30 +1,40 @@
 #include "LoadBalancer.hpp"
+#include "Server.hpp"
+#include "Utils.hpp"
 #include <cstddef>
 #include <iostream>
 #include <random>
 #include <string>
 #include <vector>
 
-
-
-std::pair<LoadBalancer,double> parseArguments(int argc, char* argv[]);
+#ifdef Q4
+std::pair<LoadBalancer, double> parseArguments(int argc, char* argv[]);
 
 int main(int argc, char* argv[]) {
-    auto [loadBalancer,simTime] = parseArguments(argc, argv);
+    auto [loadBalancer, simTime] = parseArguments(argc, argv);
     loadBalancer.simulate(simTime);
     return 0;
 }
 
-std::pair<LoadBalancer,double> parseArguments(int argc, char* argv[]) {
+std::pair<LoadBalancer, double> parseArguments(int argc, char* argv[]) {
     // Make sure that it has at least the simulation time and servers num, internet sending rate
     if (argc < 4) {
         std::cerr << "Parsing Error: Usage <T> <M> <P_1> ... <P_M> lambda <Q_1> ... <Q_M> <mu_1> ... <mu_M>";
         exit(-1);
     }
+
     std::size_t simTime = std::stoi(argv[1]);
-    LOG(simTime);
+    if (simTime == 0) {
+        std::cerr << "Invalid simulation time" << '\n';
+        exit(-1);
+    }
+    LOG(std::format("Sim time is {}", simTime));
+
     std::size_t serversNum = std::stoi(argv[2]);
-    LOG(serversNum);
+    if (serversNum == 0) {
+        std::cerr << "Invalid servers num" << '\n';
+    }
+    LOG(std::format("Servers Num is {}", serversNum));
 
     int currIdx = 3;
     std::vector<double> probVec;
@@ -36,7 +46,7 @@ std::pair<LoadBalancer,double> parseArguments(int argc, char* argv[]) {
 
     LOG("Prob Vec");
     std::for_each(probVec.begin(), probVec.end(),
-                  [](auto&& prob) { LOG(std::format("{},", std::forward<decltype(prob)>(prob))); });
+                  [](auto&& prob) { std::cout << (std::format("{},", std::forward<decltype(prob)>(prob))); });
 
     currIdx += serversNum;
 
@@ -71,5 +81,20 @@ std::pair<LoadBalancer,double> parseArguments(int argc, char* argv[]) {
     LoadBalancer loadBalancer{internetSendingRate, std::move(probVec), std::move(maxQueueSizesVec),
                               std::move(servingRateVec)};
 
-    return {loadBalancer,simTime};
+    return {loadBalancer, simTime};
 }
+
+#else
+
+int main() {
+    Server server(1, 2, 1000);
+    for (int i = 0; i < 5; ++i) {
+        Server::SimResult result = server.simulate(5);
+        std::cout << std::format("Served {}, Average wait time {}\n", result.totalServedQueries,
+                                 result.averageWaitTime);
+    }
+
+    return 0;
+}
+
+#endif

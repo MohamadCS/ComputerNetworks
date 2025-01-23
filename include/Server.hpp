@@ -12,11 +12,11 @@ public:
     };
 
     struct SimResult {
-        std::size_t totalServedQueries;
-        std::size_t totalDroppedQueries;
-        double lastQueryServeTime;
-        double averageWaitTime;
-        double averageServeTime;
+        std::size_t totalServedQueries = 0;
+        std::size_t totalDroppedQueries = 0;
+        double lastQueryServeTime = 0;
+        double waitTime = 0 ;
+        double serveTime = 0;
     };
 
     struct Event {
@@ -26,6 +26,10 @@ public:
 
     Server(double arrivalRate, double serviceRate, std::size_t maxQueueSize);
     SimResult simulate(double simTime) const;
+
+    double getArrivalRate() const{
+        return m_arrivalRate;
+    }
 
 private:
     double m_arrivalRate;

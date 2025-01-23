@@ -26,6 +26,7 @@ void LoadBalancer::simulate(double simTime) const {
 
     std::size_t serversNum = m_servers.size();
 
+    // Run the simlation for every server, and gather data.
     for (const auto& server : m_servers) {
         if(server.getArrivalRate() == 0){
             continue;
@@ -39,6 +40,7 @@ void LoadBalancer::simulate(double simTime) const {
         lastQueryServedTime = std::max(lastQueryServedTime, result.lastQueryServeTime);
     }
 
+    // Final Calculations
     double roundingNum = 10000.0;
     LOG(averageWaitTime);
     averageWaitTime = std::round((averageWaitTime/totalServedQueries) * roundingNum) / roundingNum;

@@ -19,7 +19,6 @@ static double getExpNumber(double rate) {
     std::mt19937 gen(rd());
     std::exponential_distribution<double> dist(rate);
     double arrivals = dist(gen);
-    LOG(std::format("{}, {}",rate,arrivals));
     return arrivals;
 }
 
@@ -108,7 +107,6 @@ Server::SimResult Server::simulate(double simTime) const {
             }
 #else
             eventHeap.push({schedTime, Server::EventType::ARRIVAL});
-            LOG(std::format("Arrive sched to {}", schedTime));
 #endif
         }
 

@@ -4,9 +4,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
-#include <random>
-#include <string>
-#include <vector>
 
 #ifdef Q4
 std::pair<LoadBalancer, double> parseArguments(int argc, char* argv[]);
@@ -65,7 +62,7 @@ std::pair<LoadBalancer, double> parseArguments(int argc, char* argv[]) {
     }
 
     if(probVec.size() != serversNum || maxQueueSizesVec.size() != serversNum || maxQueueSizesVec.size() != serversNum){
-        std::cerr << std::format("Wrong parameters\n");
+        std::cerr << "Wrong parameters\n";
     }
 
     LoadBalancer loadBalancer{internetSendingRate, std::move(probVec), std::move(maxQueueSizesVec),
@@ -82,10 +79,12 @@ std::pair<LoadBalancer, double> parseArguments(int argc, char* argv[]) {
 int main() {
     Server server(1, 2, 1000);
 
+    
+
     for (int i = 0; i < 5; ++i) {
         Server::SimResult result = server.simulate(5);
-        std::cout << std::format("Served {}, Average wait time {}\n", result.totalServedQueries,
-                                 result.waitTime/result.totalServedQueries);
+        std::cout << "Served "<< result.totalServedQueries <<" Average wait time " <<
+                                 result.waitTime/result.totalServedQueries) << '\n';
     }
 
     return 0;

@@ -11,7 +11,7 @@ SOURCES = $(CPP_SOURCES)
 OBJECTS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CPP_SOURCES))
 LINK = -I$(INCLUDE_DIR)
 
-all: $(TARGET)
+all: clean $(TARGET)
 
 leaks: $(TARGET) 
 	leaks -atExit -- $(TARGET)

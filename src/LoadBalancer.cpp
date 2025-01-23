@@ -15,7 +15,6 @@ LoadBalancer::LoadBalancer(double internetSendingRate, const std::vector<double>
     for (int i = 0; i < probVec.size(); ++i) {
         double arrivalRate = (probVec.at(i) * internetSendingRate);
         Server server(arrivalRate, servingRateVec.at(i), maxQueueVec.at(i));
-        LOG(std::format("Created server with {} {} {}", arrivalRate, servingRateVec.at(i),maxQueueVec.at(i)));
         m_servers.emplace_back(std::move(server));
     }
 }
@@ -48,5 +47,5 @@ void LoadBalancer::simulate(double simTime) const {
     LOG(averageServeTime);
     averageServeTime =std::round((averageServeTime/totalServedQueries) * roundingNum) / roundingNum; 
 
-    std::cout << std::format("{} {} {} {} {}",totalServedQueries,totalDroppedQueries,lastQueryServedTime,averageWaitTime,averageServeTime);
+    std::cout << totalServedQueries << " " << totalDroppedQueries << " " <<lastQueryServedTime <<" " <<averageWaitTime <<" "<<averageServeTime;
 }

@@ -1,8 +1,6 @@
 #include "Server.hpp"
 #include "Utils.hpp"
-#include <format>
 #include <functional>
-#include <iostream>
 #include <queue>
 #include <random>
 #include <unistd.h>

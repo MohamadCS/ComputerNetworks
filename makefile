@@ -1,5 +1,5 @@
 CXX= g++
-CFLAGS= -g -std=c++23
+CFLAGS= -g -std=c++17
 INCLUDE_DIR=./include
 SRC_DIR = ./src
 BUILD_DIR = ./build
